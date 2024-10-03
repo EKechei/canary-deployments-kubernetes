@@ -3,7 +3,9 @@
 # Problem Statement:
 
 An organization running a cloud-native application on Kubernetes is looking to improve its deployment process to reduce the risk of downtime and application errors during updates. The current approach uses full, immediate rollouts, which can lead to issues like service outages, bugs in the new version impacting all users, and a lack of quick rollback options. The company needs a more reliable deployment strategy that allows them to gradually introduce changes, monitor the new version's performance, and minimize the impact of potential issues on end-users.
+
 The organization seeks to implement a Canary Deployment strategy on Kubernetes to incrementally release new application versions to a small subset of users. This approach will allow the team to gather feedback on the new version's stability and performance while ensuring the majority of users continue to interact with the stable version. The goal is to significantly reduce downtime and improve the ability to quickly roll back or fix issues if they arise during deployment.
+
 This project aims to design and deploy a Canary Deployment pipeline within the organization’s Kubernetes cluster, leveraging advanced traffic routing to ensure a smooth and controlled application update process.
 
 ## So what is Canary Deployment? 
