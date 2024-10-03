@@ -192,6 +192,10 @@ spec:
 # 6. Test your setup
 You can use the following command to test your setup (replacing INGRESS_CONTROLLER_IP with your ingress controller IP Address)
 
+```
+for i in $(seq 1 10); do curl -s --resolve echo.prod.mydomain.com:80:$INGRESS_CONTROLLER_IP echo.prod.mydomain.com  | grep "Hostname"; done
+```
+
 ![image](https://github.com/user-attachments/assets/f0c5c49b-0781-4da9-97ab-47f2c1d1cebc)
 
 
