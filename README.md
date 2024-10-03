@@ -22,3 +22,190 @@ You can set up your cluster using the following;
 - Kind (Kubernetes IN Docker)
 - EKS
 
+# 2. Create your main deployment and service
+This is the main deployment of your application with the service that will be used to route to it.
+
+```
+echo "
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: production
+  labels:
+    app: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: production
+  template:
+    metadata:
+      labels:
+        app: production
+    spec:
+      containers:
+      - name: production
+        image: registry.k8s.io/ingress-nginx/e2e-test-echo@sha256:6fc5aa2994c86575975bb20a5203651207029a0d28e3f491d8a127d08baadab4
+        ports:
+        - containerPort: 80
+      
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: production
+  labels:
+    app: production
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  selector:
+    app: production
+" | kubectl apply -f -
+
+```
+
+
+# 3. Create the canary deployment and service
+This canary deployment will take a weighted amount of requests instead of the main deployment.
+
+```
+echo "
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: canary
+  labels:
+    app: canary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: canary
+  template:
+    metadata:
+      labels:
+        app: canary
+    spec:
+      containers:
+      - name: canary
+        image: registry.k8s.io/ingress-nginx/e2e-test-echo@sha256:6fc5aa2994c86575975bb20a5203651207029a0d28e3f491d8a127d08baadab4
+        ports:
+        - containerPort: 80
+        
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: canary
+  labels:
+    app: canary
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  selector:
+    app: canary
+" | kubectl apply -f -
+
+
+```
+
+
+# 4. Create Ingress Pointing To Your Main Deployment
+Next, you will need to expose your main deployment with an ingress resource, note there are no canary-specific annotations on this ingress
+
+```
+echo "
+---
+# Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: production
+  annotations:
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: echo.prod.mydomain.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: production
+            port:
+              number: 80
+" | kubectl apply -f -
+
+
+```
+
+
+# 5. Create Ingress Pointing To Your Canary Deployment
+You will then create an Ingress that has the canary-specific configuration, please pay special notice of the following:
+- The hostname is identical to the main ingress hostname
+- The nginx.ingress.kubernetes.io/canary: "true" annotation is required and defines this as a canary annotation (if you do not have this the Ingresses will clash)
+- The nginx.ingress.kubernetes.io/canary-weight: "10" annotation dictates the weight of the routing, in this case, there is a "10%" chance a request will hit the canary deployment over the main deployment
+
+```
+echo "
+---
+# Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: canary
+  annotations:
+    nginx.ingress.kubernetes.io/canary: \"true\"
+    nginx.ingress.kubernetes.io/canary-weight: \"50\"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: echo.prod.mydomain.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: canary
+            port:
+              number: 80
+" | kubectl apply -f -
+```
+
+
+
+# 6. Test your setup
+You can use the following command to test your setup (replacing INGRESS_CONTROLLER_IP with your ingress controller's IP Address)
+
+![image](https://github.com/user-attachments/assets/f0c5c49b-0781-4da9-97ab-47f2c1d1cebc)
+
+
+As you can see above, 9 requests went to production and 1 request went to canary, this shows that the canary setup is working as expected.
+
+
+
+
+
+
+
+
+
+
+
+
+
