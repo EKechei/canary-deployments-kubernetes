@@ -22,7 +22,7 @@ You can set up your cluster using the following;
 - Kind (Kubernetes IN Docker)
 - EKS
 
-# 2. Create your main deployment and service
+# 2. Create your main deployment and service (V1)
 This is the main deployment of your application with the service that will be used to route to it.
 
 ```
@@ -72,7 +72,7 @@ spec:
 ```
 
 
-# 3. Create the canary deployment and service
+# 3. Create the canary deployment and service (V2)
 This canary deployment will take a weighted amount of requests instead of the main deployment.
 
 ```
@@ -157,8 +157,8 @@ spec:
 # 5. Create Ingress Pointing To Your Canary Deployment
 You will then create an Ingress that has the canary-specific configuration, please pay special notice of the following:
 - The hostname is identical to the main ingress hostname
-- The nginx.ingress.kubernetes.io/canary: "true" annotation is required and defines this as a canary annotation (if you do not have this the Ingresses will clash)
-- The nginx.ingress.kubernetes.io/canary-weight: "10" annotation dictates the weight of the routing, in this case, there is a "10%" chance a request will hit the canary deployment over the main deployment
+- The nginx.ingress.kubernetes.io/canary: 'true' annotation is required and defines this as a canary annotation (if you do not have this the Ingresses will clash)
+- The nginx.ingress.kubernetes.io/canary-weight: '10' annotation dictates the weight of the routing, in this case, there is a "10%" chance a request will hit the canary deployment over the main deployment
 
 ```
 echo "
@@ -169,8 +169,8 @@ kind: Ingress
 metadata:
   name: canary
   annotations:
-    nginx.ingress.kubernetes.io/canary: \"true\"
-    nginx.ingress.kubernetes.io/canary-weight: \"50\"
+    nginx.ingress.kubernetes.io/canary: \'true\'
+    nginx.ingress.kubernetes.io/canary-weight: \'10\'
 spec:
   ingressClassName: nginx
   rules:
@@ -190,7 +190,7 @@ spec:
 
 
 # 6. Test your setup
-You can use the following command to test your setup (replacing INGRESS_CONTROLLER_IP with your ingress controller's IP Address)
+You can use the following command to test your setup (replacing INGRESS_CONTROLLER_IP with your ingress controller IP Address)
 
 ![image](https://github.com/user-attachments/assets/f0c5c49b-0781-4da9-97ab-47f2c1d1cebc)
 
