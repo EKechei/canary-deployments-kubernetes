@@ -8,14 +8,17 @@ The organization seeks to implement a Canary Deployment strategy on Kubernetes t
 
 This project aims to design and deploy a Canary Deployment pipeline within the organization’s Kubernetes cluster, leveraging advanced traffic routing to ensure a smooth and controlled application update process.
 
+
 ## So what is Canary Deployment? 
 A canary deployment strategy is a strategy that rolls out a new version of your application to a small group of users, while the majority of users continue the old version of the application. If the new version works as expected, it gradually replaces the old version.
 
+
 # Steps for Implementing Canary Deployment
+
 # 1. Set Up a Kubernetes Cluster
 You can set up your cluster using the following;
-Minikube
-Docker Desktop
-Kind (Kubernetes IN Docker)
-EKS
+- Minikube
+- Docker Desktop
+- Kind (Kubernetes IN Docker)
+- EKS
 
